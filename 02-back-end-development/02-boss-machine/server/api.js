@@ -1,5 +1,6 @@
 const express = require("express");
 const apiRouter = express.Router();
+const checkMillionDollarIdea = require('./checkMillionDollarIdea');
 const {
   getAllFromDatabase,
   getFromDatabaseById,
@@ -79,7 +80,7 @@ apiRouter.get("/ideas", (req, res, next) => {
   }
 });
 
-apiRouter.post("/ideas", (req, res, next) => {
+apiRouter.post("/ideas", checkMillionDollarIdea, (req, res, next) => {
   const savedIdea = addToDatabase("ideas", req.body);
   if (savedIdea) {
     res.status(201).send(savedIdea);

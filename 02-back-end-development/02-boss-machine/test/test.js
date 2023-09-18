@@ -586,7 +586,7 @@ describe('/api/meetings routes', function() {
 
 });
 
-/*
+
 describe('checkMillionDollarIdea middleware', function() {
 
   const checkMillionDollarIdea = require('../server/checkMillionDollarIdea');
@@ -689,7 +689,7 @@ describe('checkMillionDollarIdea middleware', function() {
 });
 
 
-xdescribe('BONUS: /api/minions/:minionId/work routes', function() {
+describe('BONUS: /api/minions/:minionId/work routes', function() {
 
   let fakeDb = require('../server/db.js').db;
   
@@ -919,4 +919,3 @@ xdescribe('BONUS: /api/minions/:minionId/work routes', function() {
     });
 
 });
-*/
