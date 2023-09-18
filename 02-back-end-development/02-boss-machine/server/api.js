@@ -1,6 +1,6 @@
 const express = require("express");
 const apiRouter = express.Router();
-const checkMillionDollarIdea = require('./checkMillionDollarIdea');
+const checkMillionDollarIdea = require("./checkMillionDollarIdea");
 const {
   getAllFromDatabase,
   getFromDatabaseById,
@@ -8,7 +8,7 @@ const {
   updateInstanceInDatabase,
   deleteFromDatabasebyId,
   deleteAllFromDatabase,
-  createMeeting
+  createMeeting,
 } = require("./db.js");
 
 apiRouter.param("minionId", (req, res, next, minionId) => {
@@ -111,31 +111,96 @@ apiRouter.delete("/ideas/:ideaId", (req, res, next) => {
   }
 });
 
-apiRouter.get('/meetings', (req, res, next) => {
-    const meetings = getAllFromDatabase('meetings');
-    if (meetings) {
-        res.send(meetings);
-      } else {
-        res.status(404).send("There was an error retrieving meetings.");
-      }
+apiRouter.get("/meetings", (req, res, next) => {
+  const meetings = getAllFromDatabase("meetings");
+  if (meetings) {
+    res.send(meetings);
+  } else {
+    res.status(404).send("There was an error retrieving meetings.");
+  }
 });
 
-apiRouter.post('/meetings', (req, res, next) => {
-    const newMeeting = addToDatabase('meetings', createMeeting());
-    if (newMeeting) {
-        res.status(201).send(newMeeting);
-      } else {
-        res.status(400).send();
-      }
+apiRouter.post("/meetings", (req, res, next) => {
+  const newMeeting = addToDatabase("meetings", createMeeting());
+  if (newMeeting) {
+    res.status(201).send(newMeeting);
+  } else {
+    res.status(400).send();
+  }
 });
 
-apiRouter.delete('/meetings', (req, res, next) => {
-    const meetings = deleteAllFromDatabase('meetings');
-    if (meetings) {
-        res.status(204).send(meetings);
-      } else {
-        res.status(400).send();
-      }
+apiRouter.delete("/meetings", (req, res, next) => {
+  const meetings = deleteAllFromDatabase("meetings");
+  if (meetings) {
+    res.status(204).send(meetings);
+  } else {
+    res.status(400).send();
+  }
 });
+
+apiRouter.get("/minions/:minionId/work", (req, res, next) => {
+  const minionWork = getAllFromDatabase("work").filter(
+    (work) => work.minionId == req.minion.id
+  );
+  if (minionWork) {
+    res.send(minionWork);
+  } else {
+    res.status(404).send("There was an error retrieving work.");
+  }
+});
+
+apiRouter.post("/minions/:minionId/work", (req, res, next) => {
+  const newWork = addToDatabase("work", { ...req.body, id: req.minion.id });
+  if (newWork) {
+    res.status(201).send(newWork);
+  } else {
+    res.status(400).send();
+  }
+});
+
+apiRouter.param("workId", (req, res, next, workId) => {
+  const work = getFromDatabaseById("work", workId);
+  if (work) {
+    req.work = work;
+    next();
+  } else {
+    res.status(404).send("Failed to find work.");
+  }
+});
+
+const checkWorkMinion = (req, res, next) => {
+  if (req.work.minionId !== req.minion.id) {
+    return res
+      .status(400)
+      .send("This work is unrelated to the minion requested.");
+  }
+  next();
+};
+
+apiRouter.put(
+  "/minions/:minionId/work/:workId",
+  checkWorkMinion,
+  (req, res, next) => {
+    const updatedWork = updateInstanceInDatabase("work", req.body);
+    if (updatedWork) {
+      res.send(updatedWork);
+    } else {
+      res.status(400).send("Failed to update work.");
+    }
+  }
+);
+
+apiRouter.delete(
+  "/minions/:minionId/work/:workId",
+  checkWorkMinion,
+  (req, res, next) => {
+    const deletedWork = deleteFromDatabasebyId("work", req.work.id);
+    if (deletedWork) {
+      res.status(204).send(deletedWork);
+    } else {
+      res.status(400).send();
+    }
+  }
+);
 
 module.exports = apiRouter;
