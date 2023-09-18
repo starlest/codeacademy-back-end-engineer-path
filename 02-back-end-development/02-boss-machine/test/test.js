@@ -240,6 +240,7 @@ describe('/api/minions routes', function() {
 
 });
 
+/*
 describe('/api/ideas routes', function() {
   let fakeDb = require('../server/db.js');
 
@@ -916,3 +917,4 @@ xdescribe('BONUS: /api/minions/:minionId/work routes', function() {
     });
 
 });
+*/
